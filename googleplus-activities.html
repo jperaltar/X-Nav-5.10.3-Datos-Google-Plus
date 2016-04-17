@@ -31,7 +31,7 @@
       // The provided key works for this sample only when run from
       // https://google-api-javascript-client.googlecode.com/hg/samples/authSample.html
       // To use in your own application, replace this API key with your own.
-      var apiKey = '';
+      var apiKey = 'AIzaSyCLe2Eq3PuXi4emXsm__HpoWhyrQ_xBSQc';
 
       // Use a button to handle authentication the first time.
       function handleClientLoad() {
@@ -43,8 +43,8 @@
       function makeApiCall() {
         gapi.client.load('plus', 'v1', function() {
           var request = gapi.client.plus.people.get({
-            'userId': ''
-            // For instance: 
+            'userId': '108086881826934773478'
+            // For instance:
             // 'userId': '+GregorioRobles'
           });
           request.execute(function(resp) {
@@ -56,11 +56,46 @@
 
             document.getElementById('content').appendChild(heading);
           });
+
+          var activitiesRequest = gapi.client.plus.activities.list({
+            'userId': '108086881826934773478',
+            'collection': 'public'
+          });
+
+          activitiesRequest.execute(function (resp) {
+            var activities = resp.items;
+
+            for (var i = 0; i < activities.length; i++){
+              var entry = document.createElement('li');
+              var title = document.createElement('h4');
+              title.innerHTML = activities[i].title;
+              entry.appendChild(title);
+              if (activities[i].object.attachments) {
+                var attachments = activities[i].object.attachments;
+                if (attachments[0].image) {
+                  var image = document.createElement('img');
+                  image.src = attachments[0].image.url;
+                  entry.appendChild(image);
+                }
+              }
+              if (activities[i].location){
+                var location = document.createElement('p');
+                var latitude = activities[i].location.position.latitude;
+                var longitude = activities[i].location.position.longitude;
+                location.innerHTML = "Lat: " + latitude + ", Long: " + longitude;
+                entry.appendChild(location);
+              }
+
+              document.getElementById('activities').appendChild(entry);
+  			    }
+          });
         });
       }
     </script>
     <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
     <div id="content"></div>
     <p>Retrieves your profile name (and picture) using the Google Plus API.</p>
+    <h4>Activities</h4>
+    <ul id="activities"></ul>
   </body>
 </html>
